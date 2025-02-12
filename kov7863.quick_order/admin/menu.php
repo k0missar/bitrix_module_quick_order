@@ -5,7 +5,7 @@ defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 use Bitrix\Main\Localization\Loc;
 Loc::loadMessages(__FILE__);
 
-if ($APPLICATION->GetGroupRight('currency')<='D')
+if ($APPLICATION->GetGroupRight('kov7863.quick_order')<='D')
 {
 	return false;
 }
