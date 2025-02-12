@@ -1,0 +1,10 @@
+.quick-order-admin__row {
+  display: flex;
+  flex-direction: row;
+}
+.quick-order-admin__row div {
+  padding: 5px 15px;
+  background-color: #ffffff;
+}
+
+/*# sourceMappingURL=style.css.map */
