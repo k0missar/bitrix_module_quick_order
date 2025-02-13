@@ -46,7 +46,7 @@ class QuickOrder
 	 * string $product_id - ID товара
 	 * @return int|bool
 	 */
-	public static function setQuickOrderProduct($name, $phone, $email, $comment, $product_id): int|bool
+	public static function setQuickOrderProduct(string $name, string $phone, string $email, string $comment, string $product_id): int|bool
 	{
 		$result = KovQuickOrderTable::add([
 			'NAME' => $name,
@@ -60,6 +60,36 @@ class QuickOrder
 		if ($result->isSuccess())
 		{
 			return $result->getId();
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Обновляет статус заказа.
+	 *
+	 * @param int $orderId
+	 * @param string $status
+	 * @return bool
+	 */
+	public static function updateOrderStatus(int $orderId, string $status): bool
+	{
+		$validStatuses = ['new', 'processed'];
+		if (!in_array($status, $validStatuses)) {
+			return false;
+		}
+
+		if ($orderId <= 0) {
+			return false;
+		}
+
+		$result = KovQuickOrderTable::update($orderId, [
+			'STATUS' => $status,
+		]);
+
+		if ($result->isSuccess())
+		{
+			return true;
 		} else {
 			return false;
 		}

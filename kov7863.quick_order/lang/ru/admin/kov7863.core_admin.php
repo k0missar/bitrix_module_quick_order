@@ -1,2 +1,2 @@
 <?php
-$MESS["CORE_CONTROL"] = "CORE Settings";
+$MESS["QUICK_ORDER"] = "QUICK_ORDER настройки";

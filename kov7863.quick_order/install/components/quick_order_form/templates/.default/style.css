@@ -23,6 +23,14 @@
   display: block;
   margin-bottom: 5px;
 }
+.quick-order-content__form input:user-invalid {
+  border: 1px solid rgb(248, 215, 218);
+  box-shadow: 0 0 0 0.2rem rgba(248, 215, 218, 0.5);
+}
+.quick-order-content__form input:user-valid {
+  border: 1px solid rgb(212, 237, 218);
+  box-shadow: 0 0 0 0.2rem rgba(212, 237, 218, 0.5);
+}
 .quick-order-content__form textarea {
   margin-bottom: 5px;
 }
