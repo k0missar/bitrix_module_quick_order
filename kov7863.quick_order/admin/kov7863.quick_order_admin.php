@@ -71,6 +71,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_ad
 			<div>
 				<form class="quick-order-admin__form-<?php echo $item['ID'];?> js-quick-order-admin-form" method="POST" action="<?php echo str_replace($_SERVER['DOCUMENT_ROOT'], '', __DIR__) . '/update_status.php'?>">
 					<input type="hidden" name="order_id" value="<?php echo $item['ID']; ?>">
+					<input type="hidden" name="sessid" value="<?php echo bitrix_sessid() ?>">
 					<select name="status">
 						<option value="new" <?php echo ($item['STATUS'] == 'new') ? 'selected' : ''; ?>>Новый</option>
 						<option value="processed" <?php echo ($item['STATUS'] == 'processed') ? 'selected' : ''; ?>>Обработано</option>

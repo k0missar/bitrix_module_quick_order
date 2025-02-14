@@ -1,19 +1,29 @@
 <?php
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
 use Bitrix\Main\Loader;
+use Bitrix\Main\Application;
+use Bitrix\Main\Mail\Event;
 use Kov7863\Quick_Order\QuickOrder;
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (!check_bitrix_sessid()) {
-	$response["errors"][] = "Ошибка сессии";
+if (!Loader::includeModule("kov7863.quick_order"))
+{
+	$response["errors"] = "Не подключен модуль Быстрый заказ";
 	echo json_encode($response, JSON_UNESCAPED_UNICODE);
 	exit;
 }
 
-if (!Loader::includeModule("kov7863.quick_order"))
-{
-	$response["errors"][] = "Не подключен модуль Быстрый заказ";
+$http_host = $_SERVER['HTTP_HOST'];
+$referer = parse_url($_SERVER['HTTP_REFERER'] ?? '', PHP_URL_HOST);
+if (!empty($referer) && $referer !== $http_host) {
+	$response["errors"] = "Ошибка: недостоверный домен. (REFERER: $referer, HOST: $http_host)";
+	echo json_encode($response, JSON_UNESCAPED_UNICODE);
+	exit;
+}
+
+if (!check_bitrix_sessid()) {
+	$response["errors"] = "Ошибка сессии";
 	echo json_encode($response, JSON_UNESCAPED_UNICODE);
 	exit;
 }
@@ -57,11 +67,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
 		if (QuickOrder::setQuickOrderProduct($name, $phone, $mail, $comment, $product_id))
 		{
+			$session = Application::getInstance()->getSession();
+			$eventType = $session->get("EVENT_TYPE");
+			$siteId = $session->get("SITE_ID");
+
+			if (!empty($eventType) && !empty($siteId))
+			{
+				$mailResult = Event::send([
+					"EVENT_NAME" => $eventType,
+					"LID" => $siteId,
+					"C_FIELDS" => [
+						"NAME" => $name,
+						"PHONE" => $phone,
+						"MAIL" => $mail,
+						"COMMENT" => $comment,
+						"PRODUCT_ID" => $product_id,
+					]
+				]);
+			}
+
 			$response["success"] = "Спасибо за заказ!";
 			echo json_encode($response, JSON_UNESCAPED_UNICODE);
+			exit;
 		} else {
 			$response["errors"] = "Ошибка добавления заказа!";
 			echo json_encode($response, JSON_UNESCAPED_UNICODE);
+			exit;
 		}
 	}
 }
