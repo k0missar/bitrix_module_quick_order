@@ -32,7 +32,7 @@ $this->setFrameMode(true);
 				</button>
 			</form>
 
-			<div class="js-quick-order-content-response"></div>
+			<div class="js-quick-order-content-response quick-order-content__response"></div>
 		<?php endif ?>
 		<button class="quick-order-content__close js-quick-order-content-close">X</button>
 	</div>

@@ -1,73 +1,89 @@
-document.addEventListener('DOMContentLoaded', ()=> {
-	//Обработка и отправка формы без перезагрузки
+document.addEventListener('DOMContentLoaded', () => {
+	// Получаем элементы
 	const quickOrderForm = document.querySelector('.js-quick-order-form')
-	const quickOrderContentJ = document.querySelector('.js-quick-order-content')
+	const quickOrderContent = document.querySelector('.js-quick-order-content')
+	const quickOrderResponse = document.querySelector('.js-quick-order-content-response')
 
-	if (quickOrderContentJ && quickOrderForm) {
-		quickOrderForm.addEventListener('submit', function (event) {
-			event.preventDefault();
+	if (!quickOrderContent || !quickOrderForm) return
 
-			const formData = new FormData(quickOrderForm)
-			const quickOrderContentResponse = document.querySelector('.js-quick-order-content-response')
-
-			const name = formData.get('name')
-			const phone = formData.get('phone')
-			const mail = formData.get('mail')
-			if (name.length < 2) {
-				quickOrderContentResponse.innerText = 'Имя слишком короткое'
-				quickOrderContentResponse.classList.add('alert', 'alert-danger', 'quick-order-content__response')
-				return
-			}
-
-			let phonePattern = /^\+7\d{10}$|^\+7 \d{3} \d{3} \d{2} \d{2}$/
-			if (!phonePattern.test(phone)) {
-				quickOrderContentResponse.innerText = 'Телефон должен быть в формате +7XXXXXXXXXX или +7 XXX XXX XX XX.'
-				quickOrderContentResponse.classList.add('alert', 'alert-danger', 'quick-order-content__response')
-				return
-			}
-
-
-			let mailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-			if (mail.length > 0 && !mailPattern.test(mail)) {
-				quickOrderContentResponse.innerText = 'Не верный формат электронной почты'
-				quickOrderContentResponse.classList.add('alert', 'alert-danger', 'quick-order-content__response')
-				return
-			}
-
-			fetch(quickOrderForm.action, {
-				method: 'POST',
-				body: formData,
-			})
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
-						quickOrderContentResponse.innerText = data.success
-						quickOrderContentResponse.classList.add('alert', 'alert-success', 'quick-order-content__response')
-
-						quickOrderForm.reset();
-					} else {
-						quickOrderContentResponse.innerText = data.errors
-						quickOrderContentResponse.classList.add('alert', 'alert-danger', 'quick-order-content__response')
-					}
-				})
-				.catch(error => {
-					console.error('Ошибка:', error);
-					quickOrderContentResponse.innerText = 'Произошла ошибка при отправке формы.'
-					quickOrderContentResponse.classList.add('alert', 'alert-danger', 'quick-order-content__response')
-				});
-		});
-
-		// Скрытие формы
-		document.addEventListener('click', event=> {
-			const target = event.target
-
-			if (target.closest('.js-quick-order-button')) {
-				return;
-			}
-
-			if (!target.closest('.js-quick-order-content') || target.closest('.js-quick-order-content-close')) {
-				quickOrderContentJ.classList.add('quick-order-content--hide')
-			}
-		})
+	function showModal() {
+		quickOrderContent.classList.remove('quick-order-content--hide')
+		quickOrderContent.classList.add('quick-order-content--show')
 	}
+
+	function hideModal() {
+		quickOrderContent.classList.remove('quick-order-content--show')
+		quickOrderContent.classList.add('quick-order-content--hide')
+	}
+
+	// Обработка формы
+	quickOrderForm.addEventListener('submit', function (event) {
+		event.preventDefault()
+		const formData = new FormData(quickOrderForm)
+
+		const name = formData.get('name')
+		const phone = formData.get('phone')
+		const mail = formData.get('mail')
+
+		quickOrderResponse.innerText = ''
+		quickOrderResponse.classList.remove('alert-success', 'alert-danger')
+
+		if (name.length < 2) {
+			quickOrderResponse.innerText = 'Имя слишком короткое'
+			quickOrderResponse.classList.add('alert', 'alert-danger')
+			return
+		}
+
+		let phonePattern = /^\+7\d{10}$|^\+7 \d{3} \d{3} \d{2} \d{2}$/
+		if (!phonePattern.test(phone)) {
+			quickOrderResponse.innerText = 'Телефон должен быть в формате +7XXXXXXXXXX или +7 XXX XXX XX XX.'
+			quickOrderResponse.classList.add('alert', 'alert-danger')
+			return
+		}
+
+		let mailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+		if (mail.length > 0 && !mailPattern.test(mail)) {
+			quickOrderResponse.innerText = 'Неверный формат электронной почты'
+			quickOrderResponse.classList.add('alert', 'alert-danger')
+			return
+		}
+
+		// Отправка формы
+		fetch(quickOrderForm.action, {
+			method: 'POST',
+			body: formData,
+		})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					quickOrderResponse.innerText = data.success
+					quickOrderResponse.classList.add('alert', 'alert-success')
+					quickOrderForm.reset()
+
+					setTimeout(hideModal, 2000)
+				} else {
+					quickOrderResponse.innerText = data.errors
+					quickOrderResponse.classList.add('alert', 'alert-danger')
+				}
+			})
+			.catch(error => {
+				console.error('Ошибка:', error)
+				quickOrderResponse.innerText = 'Произошла ошибка при отправке формы.'
+				quickOrderResponse.classList.add('alert', 'alert-danger')
+			})
+	})
+
+	// Скрытие окна
+	document.addEventListener('click', (event) => {
+		const target = event.target
+
+		if (target.closest('.js-quick-order-button')) {
+			showModal()
+			return
+		}
+
+		if (!target.closest('.js-quick-order-content') || target.closest('.js-quick-order-content-close')) {
+			hideModal()
+		}
+	})
 })
