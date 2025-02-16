@@ -36,11 +36,13 @@
 
 Пример кода php:
 
+```
 $APPLICATION->IncludeComponent(
     "kov7863:quick_order_button",
     "",
     []
 );
+```
 
 2. Форма быстрого заказа.
 Компонент quick_order_form отвечает за вывод формы быстрого заказа.
